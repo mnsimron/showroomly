@@ -74,8 +74,10 @@ export default function ShowroomDashboard() {
             <h1 className="text-3xl font-black text-slate-900">Katalog Saya</h1>
             <p className="text-slate-500 text-sm">Kelola stok mobil di <span className="font-bold">{showroom?.name}</span></p>
           </div>
-          <Link href="/dashboard/add" className="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-700 transition-all shadow-lg">
-            <HiPlus /> Tambah Mobil
+          <Link 
+            href="/dashboard/add" 
+            className="bg-primary text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-700 hover:text-white transition-all shadow-xl"
+          >            <HiPlus /> Tambah Mobil
           </Link>
         </div>
 

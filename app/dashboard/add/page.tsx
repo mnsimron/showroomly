@@ -146,7 +146,7 @@ export default function AddCarPage() { // Hapus 'async' di sini
             <input name="mileage" type="number" className="w-full p-3 bg-slate-50 border-none rounded-xl mt-1" required />
           </div>
           
-          <button type="submit" disabled={loading} className="col-span-2 bg-primary text-white py-4 rounded-2xl font-bold mt-4 shadow-lg">
+          <button type="submit" disabled={loading} className="col-span-2 bg-primary text-black py-4 rounded-2xl font-bold mt-4 shadow-lg hover:bg-slate-700 hover:text-white">
             {loading ? "Memproses Watermark & Upload..." : "Simpan Unit Mobil"}
           </button>
         </form>
