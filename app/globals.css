@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
+@plugin "flowbite/plugin";
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --showroomly-primary: #1e293b;
+  --showroomly-accent: #10b981;
+  --showroomly-light: #f8fafc;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--showroomly-light);
+    color: #0f172a;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Shortcut untuk tombol startup */
+  .btn-primary {
+    background-color: var(--showroomly-primary);
+    color: white;
+    transition: all 0.2s ease;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    display: block;
+    width: 100%;
+  }
+
+  /* Form Input ala Startup */
+  .input-startup {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .input-startup:focus {
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+    border-color: var(--showroomly-accent);
+  }
+
+  .bg-showroomly-light {
+    background-color: var(--showroomly-light);
+  }
+
+  .text-showroomly-primary {
+    color: var(--showroomly-primary);
+  }
+
+  .bg-showroomly-accent {
+    background-color: var(--showroomly-accent);
+    color: white;
+    border-color: transparent;
+  }
 }
