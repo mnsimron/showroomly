@@ -2,17 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { HiUserCircle, HiArrowLeftStartOnRectangle, HiCheckBadge, HiEye } from "react-icons/hi2";
 
 export default function AdminDashboard() {
   const [pendingPayments, setPendingPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     fetchPendingPayments();
   }, []);
 
   const fetchPendingPayments = async () => {
-    // Kita ambil data showroom yang statusnya 'pending' tapi sudah ada payment-nya
     const { data } = await supabase
       .from("payments")
       .select(`
@@ -26,20 +30,18 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   const handleApprove = async (paymentId: string, showroomId: string) => {
     const confirm = window.confirm("Aktifkan showroom ini?");
     if (!confirm) return;
 
     setLoading(true);
-    
-    // 1. Update status pembayaran jadi verified
     await supabase.from("payments").update({ status: 'verified' }).eq("id", paymentId);
-
-    // 2. Update status showroom jadi active
-    const { error } = await supabase
-      .from("showrooms")
-      .update({ status: 'active' })
-      .eq("id", showroomId);
+    const { error } = await supabase.from("showrooms").update({ status: 'active' }).eq("id", showroomId);
 
     if (!error) {
       alert("Showroom Berhasil Diaktifkan!");
@@ -49,21 +51,78 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="p-8 bg-slate-50 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-black text-slate-900 mb-8">Admin Showroomly</h1>
+    <div className="min-h-screen bg-slate-50">
+      {/* NAVIGATION BAR */}
+<nav className="bg-white border-b border-slate-200 px-6 md:px-12 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+  {/* LEFT SIDE: LOGO & BRAND */}
+  <div className="flex items-center gap-4">
+    <img 
+      src="/showroomly.svg" 
+      alt="Showroomly" 
+      className="h-10 md:h-12 w-auto" 
+    />
+    <div className="h-6 w-[1px] bg-slate-200 hidden md:block"></div> {/* Separator garis tipis */}
+    <h1 className="text-lg md:text-xl font-black text-slate-900 tracking-tight leading-none">
+      Admin <span className="text-slate-400 font-bold italic text-sm md:text-base">Portal</span>
+    </h1>
+  </div>
+
+  {/* RIGHT SIDE: USER MENU DROPDOWN */}
+  <div className="relative">
+    <button
+      onClick={() => setMenuOpen(!menuOpen)}
+      className="text-slate-400 hover:text-primary transition-all flex items-center group bg-slate-50 p-1 rounded-full border border-transparent hover:border-slate-200"
+    >
+      <HiUserCircle size={38} />
+    </button>
+
+    {menuOpen && (
+      <>
+        {/* Overlay untuk menutup menu saat klik di luar */}
+        <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)}></div>
+        
+        <div className="absolute right-0 top-14 w-52 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-20 animate-in fade-in zoom-in duration-200">
+          <div className="px-5 py-4 border-b border-slate-50 bg-slate-50/50">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Signed in as</p>
+            <p className="text-sm font-black text-slate-700 truncate">Super Admin</p>
+          </div>
+          
+          <div className="p-2">
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl flex items-center gap-3 transition-all"
+            >
+              <HiArrowLeftStartOnRectangle size={20} /> 
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+</nav>
+      {/* CONTENT AREA */}
+      <main className="p-8 max-w-5xl mx-auto">
+        <div className="mb-10">
+          <h2 className="text-3xl font-black text-slate-900">Antrean Aktivasi</h2>
+          <p className="text-slate-500 mt-1">Review pembayaran manual untuk memberikan akses showroom.</p>
+        </div>
         
         <div className="grid gap-4">
           {pendingPayments.map((p) => (
-            <div key={p.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-lg text-slate-800">{p.showrooms.name}</h3>
-                <p className="text-xs text-slate-400 font-mono">{p.showrooms.slug}.showroomly.id</p>
-                <div className="mt-2 flex items-center gap-4">
-                  <span className="text-emerald-600 font-bold">Rp {p.amount.toLocaleString('id-ID')}</span>
+            <div key={p.id} className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex-1">
+                <h3 className="font-bold text-xl text-slate-800">{p.showrooms.name}</h3>
+                <p className="text-xs text-slate-400 font-mono italic mb-4">{p.showrooms.slug}.showroomly.id</p>
+                
+                <div className="flex items-center gap-6">
+                  <div className="bg-emerald-50 px-4 py-2 rounded-2xl border border-emerald-100">
+                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider leading-none mb-1">Nominal Unik</p>
+                    <p className="text-xl font-black text-emerald-700 leading-none">Rp {p.amount.toLocaleString('id-ID')}</p>
+                  </div>
                   {p.proof_url && (
-                    <a href={p.proof_url} target="_blank" className="text-blue-600 text-xs font-bold hover:underline italic">
-                      Lihat Bukti Transfer →
+                    <a href={p.proof_url} target="_blank" className="flex items-center gap-2 text-blue-600 text-xs font-bold hover:underline bg-blue-50 px-3 py-2 rounded-xl border border-blue-100 transition-all">
+                      <HiEye size={18} /> Lihat Bukti Transfer
                     </a>
                   )}
                 </div>
@@ -72,18 +131,20 @@ export default function AdminDashboard() {
               <button 
                 onClick={() => handleApprove(p.id, p.showrooms.id)}
                 disabled={loading || !p.proof_url}
-                className="bg-slate-900 text-white px-6 py-2 rounded-xl font-bold hover:bg-slate-700 disabled:opacity-30 transition-all"
+                className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 disabled:opacity-30 shadow-lg shadow-slate-200 transition-all flex items-center gap-2 justify-center"
               >
-                {loading ? "Proses..." : "Approve & Aktifkan"}
+                <HiCheckBadge size={22} /> Approve & Aktifkan
               </button>
             </div>
           ))}
 
           {pendingPayments.length === 0 && !loading && (
-            <p className="text-center text-slate-400 py-20 italic">Tidak ada antrean pendaftaran baru.</p>
+            <div className="text-center py-20 bg-white rounded-[40px] border-2 border-dashed border-slate-200">
+              <p className="text-slate-400 font-medium italic">Tidak ada pendaftaran pending saat ini.</p>
+            </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

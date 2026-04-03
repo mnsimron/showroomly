@@ -3,121 +3,237 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { HiCheckCircle, HiCloudUpload, HiTrash } from "react-icons/hi";
+import { 
+  HiHome, HiPhotograph, HiCloudUpload, 
+  HiCheckCircle, HiArrowLeft, HiTrash 
+} from "react-icons/hi";
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState("showroom");
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [showroom, setShowroom] = useState<any>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchShowroom();
-  }, []);
+  useEffect(() => { fetchShowroom(); }, []);
 
   const fetchShowroom = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return router.push("/login");
-
-    const { data } = await supabase
-      .from("showrooms")
-      .select("*")
-      .eq("owner_id", user.id)
-      .single();
-
+    const { data } = await supabase.from("showrooms").select("*").eq("owner_id", user.id).single();
     setShowroom(data);
     setLoading(false);
   };
 
+  // --- LOGIC: UPDATE PROFIL ---
+  const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setUpdating(true);
+    const formData = new FormData(e.currentTarget);
+    
+    const { error } = await supabase.from("showrooms").update({
+      name: formData.get("name"),
+      whatsapp: formData.get("whatsapp"),
+      address: formData.get("address"),
+    }).eq("id", showroom.id);
+
+    if (error) alert("Gagal memperbarui profil");
+    else alert("Profil diperbarui!");
+    
+    setUpdating(false);
+    fetchShowroom();
+  };
+
+  // --- LOGIC: UPLOAD / UPDATE LOGO ---
   const handleUploadLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    console.log("Showroom ID:", showroom.id);
-    console.log("User Authenticated:", (await supabase.auth.getUser()).data.user?.id);
-
-
-    // Validasi: Harus PNG untuk Transparansi Watermark
+    
+    // Validasi format PNG (Penting untuk watermark transparan)
     if (file.type !== "image/png") {
-      alert("Gunakan format PNG transparan agar watermark terlihat bagus!");
-      return;
+      return alert("Wajib gunakan format PNG Transparan agar watermark terlihat profesional!");
     }
 
     setUpdating(true);
-    const fileName = `logo-${showroom.id}-${Date.now()}.png`;
 
-    // 1. Upload Logo Baru ke Bucket 'logos'
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("logos")
-      .upload(fileName, file);
+    try {
+      // 1. Hapus logo lama dari Storage jika ada (Opsional, agar storage bersih)
+      if (showroom.logo_url) {
+        const oldFileName = showroom.logo_url.split('/').pop();
+        await supabase.storage.from("logos").remove([oldFileName]);
+      }
 
-    if (uploadError) {
-      alert("Gagal upload: " + uploadError.message);
-    } else {
-      const { data: { publicUrl } } = supabase.storage.from("logos").getPublicUrl(fileName);
+      // 2. Upload file baru dengan nama unik
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${showroom.slug}-${Date.now()}.${fileExt}`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("logos")
+        .upload(fileName, file);
 
-      // 2. Update URL Logo di Tabel Showrooms
-      await supabase
+      if (uploadError) throw uploadError;
+
+      // 3. Ambil Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("logos")
+        .getPublicUrl(fileName);
+
+      // 4. Update table showrooms
+      const { error: updateError } = await supabase
         .from("showrooms")
         .update({ logo_url: publicUrl })
         .eq("id", showroom.id);
 
-      alert("Logo Berhasil Diperbarui!");
-      fetchShowroom(); // Refresh data
+      if (updateError) throw updateError;
+
+      alert("Logo berhasil diperbarui!");
+      fetchShowroom();
+    } catch (error: any) {
+      alert(error.message || "Terjadi kesalahan saat upload");
+    } finally {
+      setUpdating(false);
     }
-    setUpdating(false);
   };
 
-  if (loading) return <div className="p-10 text-center">Memuat Pengaturan...</div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-400 font-black italic uppercase tracking-widest">
+      Loading Showroomly...
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-black text-slate-900 mb-8">Pengaturan Showroom</h1>
-
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
-          <label className="text-sm font-bold text-slate-500 uppercase block mb-4">Logo Showroom (PNG Transparan)</label>
+    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-12">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10">
+        
+        {/* Sidebar Nav */}
+        <aside className="w-full md:w-72 space-y-3">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="group flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 transition-all mb-8"
+          >
+            <HiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Kembali Ke Dashboard
+          </button>
           
-          <div className="flex items-center gap-8">
-            {/* Preview Logo */}
-            <div className="w-32 h-32 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 overflow-hidden relative group">
-              {showroom.logo_url ? (
-                <img src={showroom.logo_url} alt="Logo" className="w-full h-full object-contain p-2" />
-              ) : (
-                <div className="text-slate-300 text-center p-2 text-[10px] font-bold">BELUM ADA LOGO</div>
-              )}
-            </div>
+          {[
+            { id: "showroom", label: "Profil Showroom", icon: <HiHome size={20}/> },
+            { id: "logo", label: "Logo & Watermark", icon: <HiPhotograph size={20}/> },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] font-black text-[11px] uppercase tracking-widest transition-all ${
+                activeTab === item.id 
+                ? "bg-[#1e293b] text-white shadow-2xl shadow-slate-300 scale-[1.02]" 
+                : "text-slate-400 hover:bg-white hover:text-slate-600"
+              }`}
+            >
+              {item.icon} {item.label}
+            </button>
+          ))}
+        </aside>
 
-            {/* Upload Control */}
-            <div className="flex-1">
-              <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                Gunakan logo dengan background transparan (.png). Logo ini akan otomatis muncul sebagai <strong>Watermark</strong> di setiap foto mobil Anda.
-              </p>
-              
-              <div className="relative">
-                <input 
-                  type="file" 
-                  accept="image/png" 
-                  onChange={handleUploadLogo}
+        {/* Main Form Area */}
+        <div className="flex-1">
+          <header className="mb-10">
+            <h2 className="text-3xl font-black text-[#1e293b] tracking-tighter uppercase italic">Pengaturan</h2>
+            <p className="text-slate-400 text-xs font-bold tracking-widest uppercase mt-1">Kelola identitas digital showroom Anda</p>
+          </header>
+
+          <main className="bg-white rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-100 p-8 md:p-12">
+            
+            {activeTab === "showroom" && (
+              <form onSubmit={handleUpdateProfile} className="space-y-8">
+                <div className="grid gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Showroom</label>
+                    <input 
+                      name="name" 
+                      defaultValue={showroom.name} 
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#10b981] focus:bg-white transition-all outline-none font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">WhatsApp Admin</label>
+                    <input 
+                      name="whatsapp" 
+                      defaultValue={showroom.whatsapp} 
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#10b981] focus:bg-white transition-all outline-none font-bold text-[#10b981]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Alamat Showroom</label>
+                    <textarea 
+                      name="address" 
+                      defaultValue={showroom.address} 
+                      rows={3}
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#10b981] focus:bg-white transition-all outline-none font-bold"
+                    />
+                  </div>
+                </div>
+                <button 
+                  type="submit"
                   disabled={updating}
-                  className="hidden" 
-                  id="logo-upload"
-                />
-                <label 
-                  htmlFor="logo-upload" 
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold cursor-pointer transition-all ${updating ? 'bg-slate-200 text-slate-400' : 'bg-primary text-white hover:bg-slate-700'}`}
+                  className="w-full md:w-auto px-10 py-4 bg-[#1e293b] text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-[#10b981] transition-all shadow-xl shadow-slate-200 disabled:opacity-50"
                 >
-                  <HiCloudUpload size={20} />
-                  {showroom.logo_url ? "Ganti Logo" : "Upload Logo Pertama"}
-                </label>
-              </div>
-            </div>
-          </div>
+                  {updating ? "Memproses..." : "Simpan Perubahan"}
+                </button>
+              </form>
+            )}
 
-          {showroom.logo_url && (
-            <div className="mt-8 pt-8 border-t border-slate-50 flex items-center gap-2 text-emerald-600 font-bold text-sm">
-              <HiCheckCircle size={20} /> Logo Aktif & Siap Digunakan untuk Watermark
-            </div>
-          )}
+            {activeTab === "logo" && (
+              <div className="space-y-10">
+                <div className="bg-slate-50 rounded-[2.5rem] p-8 border-2 border-dashed border-slate-200 flex flex-col items-center text-center">
+                  <div className="relative group">
+                    <div className="w-40 h-40 bg-white rounded-[2rem] shadow-xl flex items-center justify-center overflow-hidden border border-slate-100 mb-6 p-4">
+                      {showroom.logo_url ? (
+                        <img src={showroom.logo_url} className="w-full h-full object-contain" alt="Logo preview" />
+                      ) : (
+                        <HiPhotograph size={48} className="text-slate-100" />
+                      )}
+                    </div>
+                    {updating && (
+                       <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-[2rem] z-10">
+                          <div className="w-6 h-6 border-4 border-[#10b981] border-t-transparent rounded-full animate-spin"></div>
+                       </div>
+                    )}
+                  </div>
+
+                  <div className="max-w-xs">
+                    <h4 className="font-black text-[#1e293b] uppercase tracking-tighter text-lg">Identity Watermark</h4>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2 leading-relaxed">
+                      Upload logo PNG transparan. Logo akan otomatis menjadi watermark pada setiap foto unit mobil.
+                    </p>
+                  </div>
+
+                  <input 
+                    type="file" 
+                    id="logo-upload" 
+                    className="hidden" 
+                    onChange={handleUploadLogo} 
+                    accept="image/png" 
+                    disabled={updating}
+                  />
+                  
+                  <div className="flex gap-3 mt-8">
+                    <label 
+                      htmlFor="logo-upload" 
+                      className="cursor-pointer flex items-center gap-3 bg-[#1e293b] text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#10b981] transition-all shadow-lg shadow-slate-200"
+                    >
+                      <HiCloudUpload size={18} /> {showroom.logo_url ? "Ganti Logo" : "Upload Logo"}
+                    </label>
+                  </div>
+
+                  {showroom.logo_url && (
+                    <div className="mt-6 flex items-center gap-2 text-[#10b981] bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
+                      <HiCheckCircle size={16} />
+                      <span className="text-[9px] font-black uppercase tracking-widest">Watermark System Active</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+          </main>
         </div>
       </div>
     </div>

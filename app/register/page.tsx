@@ -4,9 +4,20 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { generateUniquePayment } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { 
+  HiOutlineUser, 
+  HiOutlineEnvelope, 
+  HiOutlineLockClosed, 
+  HiOutlineBuildingStorefront,
+  HiOutlineEye,
+  HiOutlineEyeSlash,
+  HiChevronRight
+} from "react-icons/hi2";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -19,10 +30,8 @@ export default function RegisterPage() {
     const fullName = formData.get("fullName") as string;
     const showroomName = formData.get("showroomName") as string;
     
-    // Create slug: "Limo Motor" -> "limo-motor"
     const slug = showroomName.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
 
-    // 1. SignUp ke Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -36,11 +45,22 @@ export default function RegisterPage() {
     }
 
     if (authData.user) {
-      // 2. Generate Nominal Unik (Base 100rb + 3 digit unik)
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", authData.user.id)
+        .maybeSingle();
+
+      if (profile?.role === "superadmin") {
+        router.push("/admin");
+        return;
+      }
+
       const { totalAmount, uniqueCode } = generateUniquePayment();
 
-      // 3. Simpan data Showroom
-      const { data: showroom, error: sError } = await supabase
+      const { data: showroom } = await supabase
         .from("showrooms")
         .insert([{ 
           owner_id: authData.user.id, 
@@ -51,7 +71,6 @@ export default function RegisterPage() {
         .select().single();
 
       if (showroom) {
-        // 4. Simpan data Payment Pending
         await supabase.from("payments").insert([{
           showroom_id: showroom.id,
           amount: totalAmount,
@@ -59,7 +78,6 @@ export default function RegisterPage() {
           status: 'pending'
         }]);
         
-        // 5. ALUR: Setelah berhasil, langsung lempar ke Onboarding
         router.push("/onboarding"); 
       }
     }
@@ -67,21 +85,103 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
-      <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
-        <h1 className="text-3xl font-black text-primary text-center mb-2">Showroomly</h1>
-        <p className="text-slate-500 text-center text-sm mb-8 font-medium">Mulai katalog mobil modern Anda.</p>
-        
-        <form onSubmit={handleRegister} className="space-y-4">
-          <input name="fullName" placeholder="Nama Lengkap Pemilik" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-accent" required />
-          <input name="showroomName" placeholder="Nama Showroom (Limo Motor)" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-accent" required />
-          <input name="email" type="email" placeholder="email@bisnis.com" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-accent" required />
-          <input name="password" type="password" placeholder="Password" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-accent" required />
+    <div className="min-h-screen flex items-center justify-center p-6 bg-[#f8fafc]">
+      <div className="max-w-[440px] w-full">
+        <div className="flex flex-col items-center mb-10 group">
+        <div className="flex items-center gap-2">
+          <img src="/showroomly.svg" alt="Showroomly" className="h-12 md:h-14 w-auto" />
+        </div>
+        </div>
+        <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-100 relative overflow-hidden">
           
-          <button type="submit" disabled={loading} className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:opacity-90 transition-all mt-2">
-            {loading ? "Menyiapkan Akun..." : "Daftar & Ambil Kode Unik"}
-          </button>
-        </form>
+          <header className="mb-8">
+            <h2 className="text-xl font-black text-[#1e293b] uppercase tracking-tighter">Buat Akun Showroom</h2>
+            <p className="text-slate-400 text-xs font-medium mt-1">Daftarkan bisnis showroom Anda hari ini.</p>
+          </header>
+
+          <form onSubmit={handleRegister} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
+              <div className="relative">
+                <HiOutlineUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                <input name="fullName" placeholder="Masukkan Nama Anda" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white rounded-2xl outline-none font-bold text-sm transition-all" required />
+              </div>
+            </div>
+
+            {/* Input Nama Showroom */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Bisnis Showroom</label>
+              <div className="relative">
+                <HiOutlineBuildingStorefront className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                <input name="showroomName" placeholder="Masukkan Nama Showroom" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white rounded-2xl outline-none font-bold text-sm transition-all" required />
+              </div>
+            </div>
+
+            {/* Input Email */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Bisnis</label>
+              <div className="relative">
+                <HiOutlineEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                <input name="email" type="email" placeholder="Masukkan Email Anda" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white rounded-2xl outline-none font-bold text-sm transition-all" required />
+              </div>
+            </div>
+
+            {/* Input Password */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
+              <div className="relative">
+                <HiOutlineLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                <input 
+                  name="password" 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="********" 
+                  className="w-full pl-12 pr-12 py-3.5 bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white rounded-2xl outline-none font-bold text-sm transition-all" 
+                  required 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <HiOutlineEyeSlash size={18} /> : <HiOutlineEye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full bg-[#1e293b] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-[#10b981] transition-all shadow-xl shadow-slate-200 mt-4 disabled:opacity-50"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>Daftar & Aktivasi <HiChevronRight size={16} /></>
+              )}
+            </button>
+          </form>
+
+          {/* Footer Link */}
+          <div className="mt-8 pt-6 border-t border-slate-50 text-center">
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              Sudah Bergabung?{" "}
+              <Link href="/login" className="text-[#10b981] hover:underline underline-offset-4 ml-1">
+                Masuk ke Dashboard
+              </Link>
+            </p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-2">
+            Kembali ke landing page ?{" "}
+            <Link href="/" className="text-[#10b981] hover:underline underline-offset-4 ml-1">
+              Klik
+            </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Floating Credit/Footer */}
+        <p className="text-center text-slate-300 text-[9px] font-bold uppercase tracking-[0.4em] mt-10">
+          Powered by Showroomly Engine
+        </p>
       </div>
     </div>
   );

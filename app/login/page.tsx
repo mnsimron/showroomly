@@ -11,17 +11,29 @@ export default function LoginPage() {
   const router = useRouter();
 
   // --- PENJAGAAN: JIKA SUDAH LOGIN, JANGAN KASIH MASUK KE HALAMAN INI ---
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        router.push("/dashboard");
+useEffect(() => {
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+      // Ambil role user dari profile
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (profile?.role === 'superadmin') {
+        router.push("/admin");
       } else {
-        setLoading(false); // Berhenti loading jika memang belum login
+        router.push("/dashboard");
       }
-    };
-    checkUser();
-  }, [router]);
+    } else {
+      setLoading(false); 
+    }
+  };
+  checkUser();
+}, [router]);
 
   const logos = [
   "audi.svg",
@@ -69,19 +81,39 @@ export default function LoginPage() {
     }
 
     if (data.user) {
-      // Cek status showroom (Logic Anda sudah bagus)
-      const { data: showroom } = await supabase
-        .from("showrooms")
-        .select("status")
-        .eq("owner_id", data.user.id)
-        .single();
+      // 1. CEK ROLE TERLEBIH DAHULU
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
 
-      if (showroom?.status === 'active') {
-        router.push("/dashboard");
-      } else {
-        router.push("/onboarding");
+      // Jika Superadmin, arahkan dan BERHENTI (return)
+      if (profile?.role === 'superadmin') {
+        router.push("/admin");
+        return; // <--- WAJIB ADA AGAR TIDAK LANJUT KE BAWAH
       }
-    }
+
+      // 2. CEK ROLE OWNER (Opsional jika ingin eksplisit)
+      if (profile?.role === 'owner') {
+        // Cek status showroom
+        const { data: showroom } = await supabase
+          .from("showrooms")
+          .select("status")
+          .eq("owner_id", data.user.id)
+          .maybeSingle();
+
+        if (showroom?.status === 'active') {
+          router.push("/dashboard");
+        } else {
+          router.push("/onboarding");
+        }
+        return; // BERHENTI
+      }
+
+      // Jika role tidak ditemukan (fallback)
+      router.push("/dashboard");     }
+
   };
 
   // Tampilkan blank/loading screen sebentar saat sistem cek session
@@ -95,21 +127,24 @@ return (
   <div className="min-h-screen grid md:grid-cols-2 bg-[var(--showroomly-light)]">
 
   {/* LEFT SIDE */}
-  <div className="hidden md:flex flex-col justify-center px-16 bg-[var(--showroomly-primary)] text-white overflow-hidden">
+  <div className="hidden md:flex flex-col justify-center px-16 bg-[var(--showroomly-light-bg)] text-white overflow-hidden">
+    <div className="flex items-center gap-2 mb-10">
+      <img src="/showroomly.svg" alt="Showroomly" className="h-12 md:h-14 w-auto" />
+    </div>
 
     <h1 className="text-5xl font-black leading-tight mb-6">
       Kelola Katalog <br /> Showroom Anda
     </h1>
 
-    <p className="text-slate-300 text-lg leading-relaxed max-w-md">
+    <p className="text-white-300 text-lg leading-relaxed max-w-md">
       Showroomly membantu showroom mobil memiliki katalog digital yang
       modern, mudah dikelola, dan siap dibagikan ke pelanggan kapan saja.
     </p>
 
     {/* LOGO CAROUSEL */}
     <div className="mt-12 w-full overflow-hidden">
-      <div className="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-[var(--showroomly-primary)] to-transparent z-10" />
-      <div className="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-[var(--showroomly-primary)] to-transparent z-10" />
+      <div className="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-[var(--showroomly-light-bg)] to-transparent z-10" />
+      {/* <div className="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-[var(--showroomly-light-bg)] to-transparent z-10" /> */}
       <div className="flex gap-10 animate-logo-scroll w-max">
 
         {[...logos, ...logos].map((logo, i) => (
@@ -123,8 +158,8 @@ return (
       </div>
     </div>
 
-    <div className="mt-12 text-sm text-slate-400">
-      Powered by Showroomly
+    <div className="mt-12 text-sm text-white-400">
+      Powered by Showroomly.
     </div>
 
   </div>
@@ -132,8 +167,7 @@ return (
     {/* RIGHT SIDE */}
     <div className="flex items-center justify-center p-8">
 
-      <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-xl border border-slate-100">
-
+      <div className="max-w-md w-full">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-black text-[var(--showroomly-primary)]">
             Masuk Showroomly

@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { HiChevronLeft, HiChevronRight, HiCalendar, HiLightningBolt, HiTag, HiCash } from "react-icons/hi";
 import Link from "next/link";
 import { HiOutlineShare } from "react-icons/hi";
+import { FaCarSide } from "react-icons/fa6";
 
 export default function CarDetailPage() {
   const { id } = useParams();
@@ -111,10 +112,14 @@ export default function CarDetailPage() {
               </h1>
               
               {/* Grid Spek Singkat */}
-              <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="grid grid-cols-4 gap-3 mb-8">
+                <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-100">
+                  <FaCarSide className="text-primary mb-1" size={20} />
+                  <span className="text-xs font-black text-slate-800">{car.year}</span>
+                </div>
                 <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-100">
                   <HiCalendar className="text-primary mb-1" size={20} />
-                  <span className="text-xs font-black text-slate-800">{car.year}</span>
+                  <span className="text-xs font-black text-slate-800">{car.type_car}</span>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-100">
                   <HiLightningBolt className="text-primary mb-1" size={20} />

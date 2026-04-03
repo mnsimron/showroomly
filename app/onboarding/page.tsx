@@ -14,22 +14,33 @@ export default function OnboardingPage() {
     fetchPaymentInfo();
   }, []);
 
-  const fetchPaymentInfo = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return router.push("/login");
+const fetchPaymentInfo = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return router.push("/login");
 
-    // Ambil data pembayaran berdasarkan owner_id user yang login
-    const { data, error } = await supabase
-      .from("payments")
-      .select(`*, showrooms!inner(name, owner_id)`)
-      .eq("showrooms.owner_id", user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+  // --- CEK ROLE DISINI ---
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
 
-    if (data) setPaymentData(data);
-    setLoading(false);
-  };
+  if (profile?.role === 'superadmin') {
+    return router.push("/admin"); // Jika admin nyasar ke sini, lempar ke /admin
+  }
+  // -----------------------
+
+  const { data, error } = await supabase
+    .from("payments")
+    .select(`*, showrooms!inner(name, owner_id)`)
+    .eq("showrooms.owner_id", user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle(); // Gunakan maybeSingle agar lebih aman
+
+  if (data) setPaymentData(data);
+  setLoading(false);
+};
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
