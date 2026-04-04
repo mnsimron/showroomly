@@ -28,7 +28,6 @@ const fetchPaymentInfo = async () => {
   if (profile?.role === 'superadmin') {
     return router.push("/admin"); // Jika admin nyasar ke sini, lempar ke /admin
   }
-  // -----------------------
 
   const { data, error } = await supabase
     .from("payments")
@@ -67,7 +66,7 @@ const fetchPaymentInfo = async () => {
         .eq("id", paymentData.id);
 
       alert("Bukti terkirim! Admin akan memvalidasi pendaftaran Anda.");
-      router.refresh();
+      router.push("/payment-validation"); // Kembali ke homepage setelah upload, atau bisa ke halaman lain sesuai
     }
     setUploading(false);
   };

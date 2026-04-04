@@ -29,6 +29,21 @@ export default function RegisterPage() {
     const password = formData.get("password") as string;
     const fullName = formData.get("fullName") as string;
     const showroomName = formData.get("showroomName") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+        // 🔥 1. VALIDASI HARUS DI SINI (Sebelum SignUp)
+    if (password !== confirmPassword) {
+      alert("Password dan konfirmasi password tidak cocok.");
+      setLoading(false);
+      return; // Berhenti di sini, jangan lanjut ke bawah
+    }
+
+    // 2. Validasi panjang password (opsional tapi disarankan)
+    if (password.length < 6) {
+      alert("Password minimal 6 karakter.");
+      setLoading(false);
+      return;
+    }
     
     const slug = showroomName.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
 
@@ -133,6 +148,27 @@ export default function RegisterPage() {
                 <HiOutlineLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                 <input 
                   name="password" 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="********" 
+                  className="w-full pl-12 pr-12 py-3.5 bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white rounded-2xl outline-none font-bold text-sm transition-all" 
+                  required 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <HiOutlineEyeSlash size={18} /> : <HiOutlineEye size={18} />}
+                </button>
+              </div>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Konfirmasi Password</label>
+              <div className="relative">
+                <HiOutlineLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                <input 
+                  name="confirmPassword" 
                   type={showPassword ? "text" : "password"} 
                   placeholder="********" 
                   className="w-full pl-12 pr-12 py-3.5 bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white rounded-2xl outline-none font-bold text-sm transition-all" 

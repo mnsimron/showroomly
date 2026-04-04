@@ -73,7 +73,7 @@ useEffect(() => {
     if (authError) {
       // Custom error message agar lebih "friendly"
       const msg = authError.message === "Invalid login credentials" 
-        ? "Email atau password salah. Cek kembali akun Showroomly Anda."
+        ? "Email atau password salah.\nCek kembali akun Showroomly Anda."
         : authError.message;
       setError(msg);
       setLoading(false);
@@ -105,6 +105,8 @@ useEffect(() => {
 
         if (showroom?.status === 'active') {
           router.push("/dashboard");
+        } else if (showroom?.status === 'pending') {
+          router.push("/payment-validation");
         } else {
           router.push("/onboarding");
         }
@@ -178,7 +180,7 @@ return (
         </div>
 
         {error && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl text-center font-medium">
+          <div className="mb-6 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl text-center font-medium whitespace-pre-line">
             {error}
           </div>
         )}

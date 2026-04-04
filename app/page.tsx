@@ -33,9 +33,14 @@ export default function LandingPage() {
             <Link href="#explore" className="hover:text-[var(--showroomly-accent)] transition-colors">Stok</Link>
             <Link href="#" className="hover:text-[var(--showroomly-accent)] transition-colors">Cara Kerja</Link>
           </div>
+          <div className="flex gap-4">
+          <Link href="/register" className="bg-[var(--showroomly-primary)] text-white px-5 py-2 rounded-2xl font-black text-xs hover:bg-[var(--showroomly-accent)] transition-all active:scale-95">
+            Daftar
+          </Link>
           <Link href="/dashboard" className="bg-[var(--showroomly-primary)] text-white px-5 py-2 rounded-2xl font-black text-xs hover:bg-[var(--showroomly-accent)] transition-all active:scale-95">
             Masuk Admin
           </Link>
+          </div>
         </div>
       </nav>
 
@@ -111,10 +116,10 @@ export default function LandingPage() {
       Dapatkan halaman katalog dengan subdomain khusus untuk showroom Anda dan mulai tampilkan semua unit secara online.
     </p>
 
-    <button className="bg-[var(--showroomly-accent)] text-white px-6 py-3 rounded-2xl font-bold mx-auto w-fit flex items-center gap-2 hover:gap-4 transition-all">
+    <Link href="/register" className="bg-[var(--showroomly-accent)] text-white px-6 py-3 rounded-2xl font-bold mx-auto w-fit flex items-center gap-2 hover:gap-4 transition-all">
       Buat Showroom <HiArrowRight />
-    </button>
-    
+    </Link>
+
   </div>
 
 </section>

@@ -156,6 +156,7 @@ export default function SettingsPage() {
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">WhatsApp Admin</label>
                     <input 
                       name="whatsapp" 
+                      type="number"
                       defaultValue={showroom.whatsapp} 
                       className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#10b981] focus:bg-white transition-all outline-none font-bold text-[#10b981]"
                     />

@@ -31,6 +31,7 @@ interface Showroom {
   owner_id: string;
   name: string;
   status: "active" | "pending" | "inactive";
+  logo_url?: string | null;
 }
 
 export default function ShowroomDashboard() {
@@ -39,6 +40,8 @@ export default function ShowroomDashboard() {
   const [showroom, setShowroom] = useState<Showroom | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logoModalOpen, setLogoModalOpen] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
 
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -78,6 +81,12 @@ export default function ShowroomDashboard() {
     }
     
     setShowroom(data);
+
+    if (data && !data.logo_url) {
+      setLogoError("Anda belum upload logo untuk watermark. Silahkan ke settings dan upload logo showroom Anda.");
+      setLogoModalOpen(true);
+    }
+
     return data;
   };
 
@@ -158,6 +167,13 @@ export default function ShowroomDashboard() {
           <div className="flex items-center gap-3 relative" ref={menuRef}>
             <Link
               href="/dashboard/add"
+              onClick={(e) => {
+                if (!showroom?.logo_url) {
+                  e.preventDefault();
+                  setLogoError("Anda belum upload logo untuk watermark. Silahkan ke settings dan upload logo showroom Anda.");
+                  setLogoModalOpen(true);
+                }
+              }}
               className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-700 transition-all shadow-lg text-sm"
             >
               <HiPlus /> Tambah Unit
@@ -195,6 +211,52 @@ export default function ShowroomDashboard() {
             >
               ×
             </button>
+          </div>
+        )}
+
+        {logoModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setLogoModalOpen(false)}>
+            <div className="max-w-md w-full bg-white rounded-[2rem] shadow-2xl border border-slate-200 p-6" onClick={(event) => event.stopPropagation()}>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-black text-slate-900">Logo Showroom Belum Tersedia</h2>
+                    <p className="text-sm text-slate-500 mt-1">Watermark belum dapat dibuat tanpa logo showroom.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setLogoModalOpen(false)}
+                    className="text-slate-400 hover:text-slate-900 transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-600">
+                  {logoError}
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setLogoModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+                  >
+                    Tutup
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLogoModalOpen(false);
+                      router.push('/dashboard/settings');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-700 transition-colors"
+                  >
+                    Buka Settings
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -270,7 +332,16 @@ export default function ShowroomDashboard() {
         {cars.length === 0 && !loading && (
           <div className="text-center py-32 bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
              <p className="text-slate-300 font-bold italic tracking-tight">Katalog Anda masih kosong.</p>
-             <Link href="/dashboard/add" className="text-primary text-xs font-black underline mt-2 inline-block">Klik untuk tambah unit pertama</Link>
+             <Link 
+              href="/dashboard/add"
+              onClick={(e) => {
+                if (!showroom?.logo_url) {
+                  e.preventDefault();
+                  setLogoError("Anda belum upload logo untuk watermark. Silahkan ke settings dan upload logo showroom Anda.");
+                  setLogoModalOpen(true);
+                }
+              }}
+              className="text-primary text-xs font-black underline mt-2 inline-block">Klik untuk tambah unit pertama</Link>
           </div>
         )}
       </div>

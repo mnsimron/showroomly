@@ -10,6 +10,8 @@ export default function AdminDashboard() {
   const [pendingPayments, setPendingPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
@@ -17,22 +19,50 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchPendingPayments = async () => {
-    const { data } = await supabase
-      .from("payments")
-      .select(`
-        *,
-        showrooms!inner(id, name, slug, owner_id)
-      `)
-      .eq("status", "pending")
-      .order("created_at", { ascending: false });
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("payments")
+        .select(`
+          *,
+          showrooms (
+            id,
+            name,
+            slug
+          )
+        `)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
 
-    if (data) setPendingPayments(data);
-    setLoading(false);
+      if (error) {
+        console.error("Query Error:", error.message);
+        return;
+      }
+
+      // Pastikan data showroom tidak null (karena relasi)
+      const filteredData = data?.filter(item => item.showrooms !== null) || [];
+      setPendingPayments(filteredData);
+    } catch (err) {
+      console.error("Fetch Error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/login");
+  };
+
+  const openImageModal = (imageUrl: string) => {
+    setSelectedImageUrl(imageUrl);
+    setImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setImageModalOpen(false);
+    setSelectedImageUrl("");
   };
 
   const handleApprove = async (paymentId: string, showroomId: string) => {
@@ -40,14 +70,25 @@ export default function AdminDashboard() {
     if (!confirm) return;
 
     setLoading(true);
-    await supabase.from("payments").update({ status: 'verified' }).eq("id", paymentId);
-    const { error } = await supabase.from("showrooms").update({ status: 'active' }).eq("id", showroomId);
+    
+    try {
+      // Jalankan update secara paralel
+      const [resPayment, resShowroom] = await Promise.all([
+        supabase.from("payments").update({ status: 'verified' }).eq("id", paymentId),
+        supabase.from("showrooms").update({ status: 'active' }).eq("id", showroomId)
+      ]);
 
-    if (!error) {
+      if (resPayment.error) throw new Error("Gagal update payment: " + resPayment.error.message);
+      if (resShowroom.error) throw new Error("Gagal update showroom: " + resShowroom.error.message);
+
       alert("Showroom Berhasil Diaktifkan!");
-      fetchPendingPayments();
+      await fetchPendingPayments(); // Refresh list
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -121,9 +162,12 @@ export default function AdminDashboard() {
                     <p className="text-xl font-black text-emerald-700 leading-none">Rp {p.amount.toLocaleString('id-ID')}</p>
                   </div>
                   {p.proof_url && (
-                    <a href={p.proof_url} target="_blank" className="flex items-center gap-2 text-blue-600 text-xs font-bold hover:underline bg-blue-50 px-3 py-2 rounded-xl border border-blue-100 transition-all">
+                    <button 
+                      onClick={() => openImageModal(p.proof_url)}
+                      className="flex items-center gap-2 text-blue-600 text-xs font-bold hover:underline bg-blue-50 px-3 py-2 rounded-xl border border-blue-100 transition-all"
+                    >
                       <HiEye size={18} /> Lihat Bukti Transfer
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>
@@ -145,6 +189,30 @@ export default function AdminDashboard() {
           )}
         </div>
       </main>
+
+      {/* IMAGE MODAL */}
+      {imageModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={closeImageModal}>
+          <div className="relative max-w-4xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={closeImageModal}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors text-2xl font-bold z-10"
+            >
+              ✕
+            </button>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src={selectedImageUrl}
+                alt="Bukti Transfer"
+                className="w-full h-auto max-h-[80vh] object-contain"
+              />
+              <div className="p-4 bg-slate-50 border-t border-slate-200">
+                <p className="text-sm font-bold text-slate-700 text-center">Bukti Transfer</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
