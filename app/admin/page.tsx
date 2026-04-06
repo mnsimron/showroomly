@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { HiUserCircle, HiArrowLeftStartOnRectangle, HiCheckBadge, HiEye } from "react-icons/hi2";
+import { FaWhatsapp } from "react-icons/fa";
 
 export default function AdminDashboard() {
   const [pendingPayments, setPendingPayments] = useState<any[]>([]);
@@ -28,7 +29,8 @@ export default function AdminDashboard() {
           showrooms (
             id,
             name,
-            slug
+            slug,
+            whatsapp
           )
         `)
         .eq("status", "pending")
@@ -154,6 +156,10 @@ export default function AdminDashboard() {
             <div key={p.id} className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex-1">
                 <h3 className="font-bold text-xl text-slate-800">{p.showrooms.name}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-slate-400 font-mono italic">{new Date(p.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                </div>
+                <h4 className="text-lg text-slate-400 font-mono italic flex items-center gap-2"><span className="text-green-500 flex items-center gap-2"><FaWhatsapp /> {p.showrooms.whatsapp}</span></h4>
                 <p className="text-xs text-slate-400 font-mono italic mb-4">{p.showrooms.slug}.showroomly.id</p>
                 
                 <div className="flex items-center gap-6">
@@ -175,7 +181,7 @@ export default function AdminDashboard() {
               <button 
                 onClick={() => handleApprove(p.id, p.showrooms.id)}
                 disabled={loading || !p.proof_url}
-                className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 disabled:opacity-30 shadow-lg shadow-slate-200 transition-all flex items-center gap-2 justify-center"
+                className="bg-slate-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-900 disabled:opacity-50 shadow-lg shadow-slate-200 transition-all flex items-center gap-2 justify-center"
               >
                 <HiCheckBadge size={22} /> Approve & Aktifkan
               </button>

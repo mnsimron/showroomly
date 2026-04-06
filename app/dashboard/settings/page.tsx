@@ -105,7 +105,6 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-12">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10">
         
-        {/* Sidebar Nav */}
         <aside className="w-full md:w-72 space-y-3">
           <button
             onClick={() => router.push("/dashboard")}
@@ -132,7 +131,6 @@ export default function SettingsPage() {
           ))}
         </aside>
 
-        {/* Main Form Area */}
         <div className="flex-1">
           <header className="mb-10">
             <h2 className="text-3xl font-black text-[#1e293b] tracking-tighter uppercase italic">Pengaturan</h2>

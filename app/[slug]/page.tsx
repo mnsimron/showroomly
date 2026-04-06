@@ -87,8 +87,8 @@ export default async function PublicCatalog({
         {/* <h1 className="text-xl md:text-2xl font-black tracking-tighter uppercase italic leading-none">
           {showroom.name}
         </h1> */}
-        <div className="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          <HiOutlineMapPin className="text-[#10b981]" size={14} /> 
+        <div className="flex text-center items-center gap-1.5 mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          {/* <HiOutlineMapPin className="text-[#10b981]" size={14} />  */}
           {showroom.address || "Indonesia"}
         </div>
       </header>
@@ -172,8 +172,13 @@ export default async function PublicCatalog({
                 />
                 
                 {car.status === 'booking' && (
-                <div className="absolute top-3 left-3 bg-[#10b981] text-white text-[7px] font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg z-10 animate-pulse">
+                <div className="absolute top-3 left-3 bg-[orange] text-white text-[7px] font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg z-10 animate-pulse">
                     Booked
+                </div>
+                )}
+                                {car.status === 'available' && (
+                <div className="absolute top-3 left-3 bg-[#10b981] text-white text-[7px] font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg z-10 animate-pulse">
+                    Ready
                 </div>
                 )}
 
