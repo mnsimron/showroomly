@@ -45,6 +45,8 @@ export function middleware(req: NextRequest) {
     url.pathname.startsWith('/_next') || 
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/static') ||
+    url.pathname.startsWith('/manifest.json') ||
+    url.pathname.startsWith('/sw.js') ||
     url.pathname.includes('.') 
   ) {
     return NextResponse.next();
