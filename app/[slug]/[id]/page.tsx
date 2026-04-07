@@ -59,6 +59,11 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                     Unit Booked
                   </span>
                 )}
+                {car.status === 'available' && (
+                  <span className="bg-green-500 text-white text-[9px] font-black px-4 py-1.5 rounded-xl uppercase tracking-widest">
+                    Unit Available
+                  </span>
+                )}
               </div>
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.85] text-[#1e293b]">
                 {car.brand} <br /> {car.model}
@@ -66,9 +71,13 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
             </div>
 
             <div className="bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100 min-w-[260px] shadow-sm">
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Harga Penawaran</p>
-              <p className="text-4xl font-black text-[#1e293b] italic leading-none">
-                Rp {(car.price_cash / 1000000).toFixed(0)}<span className="text-lg text-slate-300 ml-1 not-italic font-bold">Juta</span>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Harga Cash</p>
+              <p className="text-2xl font-black text-[#1e293b] italic leading-none">
+                Rp {car.price_cash?.toLocaleString()}<span className="text-lg text-slate-300 ml-1 not-italic font-bold">Juta</span>
+              </p>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Harga Kredit</p>
+              <p className="text-2xl font-black text-[#1e293b] italic leading-none">
+                Rp {car.price_credit?.toLocaleString()}<span className="text-lg text-slate-300 ml-1 not-italic font-bold">Juta</span>
               </p>
             </div>
           </div>

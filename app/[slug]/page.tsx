@@ -176,7 +176,7 @@ export default async function PublicCatalog({
                     Booked
                 </div>
                 )}
-                                {car.status === 'available' && (
+                {car.status === 'available' && (
                 <div className="absolute top-3 left-3 bg-[#10b981] text-white text-[7px] font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg z-10 animate-pulse">
                     Ready
                 </div>
@@ -200,8 +200,8 @@ export default async function PublicCatalog({
                 <div className="mb-3">
                 <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Harga Cash</p>
                 <p className="text-xl font-black text-[#1e293b] leading-none italic tracking-tighter">
-                    Rp {(car.price_cash / 1000000).toFixed(0)}<span className="text-sm ml-0.5 uppercase not-italic text-slate-400">Jt</span>
-                </p>
+                      Rp {car.price_cash?.toLocaleString()}<span className="text-sm ml-0.5 uppercase not-italic text-slate-400">Jt</span>
+                  </p>
                 </div>
 
                 {/* <div className="h-[1px] w-full bg-slate-50 mb-4" /> */}
@@ -241,14 +241,14 @@ export default async function PublicCatalog({
     </main>
 
       {/* 📱 FLOATING CTA - DESIGN MODERN STARTUP */}
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-md px-6 py-4 bg-[#1e293b]/95 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-50 flex items-center justify-between border border-white/10">
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 w-[90%] max-w-md px-6 py-4 bg-[#1e293b]/95 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-50 flex items-center justify-between border border-white/10">
          <div className="flex flex-col">
            <p className="text-[#10b981] text-[8px] font-black uppercase tracking-[0.2em] mb-0.5">Showroom Resmi</p>
            <p className="text-white text-xs font-bold tracking-tight uppercase">{showroom.name}</p>
          </div>
          
          <a 
-           href={`https://wa.me${showroom.whatsapp_number?.replace(/\D/g, '')}?text=Halo ${showroom.name}, saya melihat katalog Anda di Showroomly dan tertarik dengan salah satu unit.`} 
+           href={`https://wa.me/${showroom.whatsapp?.replace(/\D/g, '').replace(/^0/, '62')}?text=Halo ${showroom.name}, saya melihat katalog Anda di Showroomly dan tertarik dengan salah satu unit.`} 
            target="_blank"
            rel="noopener noreferrer"
            className="bg-[#10b981] hover:bg-[#0da371] text-white px-6 py-3 rounded-2xl flex items-center gap-3 transition-all active:scale-95 shadow-lg shadow-emerald-500/20"

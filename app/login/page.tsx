@@ -272,7 +272,7 @@ return (
 
           <div>
             <label className="text-sm font-semibold text-slate-600">
-              Email Bisnis
+              Email
             </label>
 
             <input
@@ -293,7 +293,7 @@ return (
               <input
               name="password"
               type="password"
-              placeholder="*********"
+              placeholder="Masukkan password Anda"
               className="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[var(--showroomly-accent)] outline-none"
               required
               />

@@ -71,7 +71,93 @@ const fetchPaymentInfo = async () => {
     setUploading(false);
   };
 
-  if (loading) return <div className="p-10 text-center font-medium">Memuat Instruksi...</div>;
+  if (loading) return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-600">
+
+      {/* CAR AREA */}
+      <div className="relative w-72 h-32 flex items-end justify-center">
+
+        {/* CAR WRAPPER */}
+        <div
+          className="relative w-56 h-20"
+          style={{ animation: "drift 2s ease-in-out infinite" }}
+        >
+
+          {/* BODY */}
+          <div className="absolute bottom-4 w-full h-12 bg-[var(--showroomly-accent)] rounded-full shadow-lg"></div>
+
+          {/* ROOF */}
+          <div className="absolute bottom-12 left-16 w-24 h-8 bg-[var(--showroomly-accent)] rounded-t-3xl"></div>
+
+          {/* WINDOWS */}
+          <div className="absolute bottom-14 left-20 w-7 h-5 bg-white rounded opacity-80"></div>
+          <div className="absolute bottom-14 left-29 w-7 h-5 bg-white rounded opacity-80"></div>
+
+          {/* HEADLIGHT */}
+          <div className="absolute bottom-8 right-0 w-3 h-3 bg-yellow-300 rounded-full blur-[1px]"></div>
+          {/* HEADLIGHT */}
+          <div className="absolute bottom-8 left-1 w-4 h-4 bg-red-600 rounded-none blur-[1px]"></div>
+
+
+          {/* WHEEL LEFT */}
+          <div
+            className="absolute bottom-0 left-12 w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center"
+            style={{ animation: "spin 1s linear infinite" }}
+          >
+            <div className="absolute w-4 h-[2px] bg-white rounded"></div>
+            <div className="absolute h-4 w-[2px] bg-white rounded"></div>
+          </div>
+
+          {/* WHEEL RIGHT */}
+          <div
+            className="absolute bottom-0 right-12 w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center"
+            style={{ animation: "spin 1s linear infinite" }}
+          >
+            <div className="absolute w-4 h-[2px] bg-white rounded"></div>
+            <div className="absolute h-4 w-[2px] bg-white rounded"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* TEXT */}
+      <div className="mt-8 text-center">
+        <div className="text-lg font-semibold">Mempersiapkan Akses...</div>
+        <p className="mt-2 text-sm text-slate-500">
+          Sedang menyalakan mesin dan memeriksa session.
+        </p>
+      </div>
+
+      <style jsx>{`
+
+        @keyframes drift {
+          0% {
+            transform: translateX(0) rotate(0deg);
+          }
+          30% {
+            transform: translateX(10px) rotate(2deg);
+          }
+          60% {
+            transform: translateX(-8px) rotate(-2deg);
+          }
+          100% {
+            transform: translateX(0) rotate(0deg);
+          }
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+      `}</style>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
