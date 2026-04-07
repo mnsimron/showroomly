@@ -123,16 +123,13 @@ useEffect(() => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-600">
 
-      {/* CAR AREA */}
       <div className="relative w-72 h-32 flex items-end justify-center">
 
-        {/* CAR WRAPPER */}
         <div
           className="relative w-56 h-20"
           style={{ animation: "drift 2s ease-in-out infinite" }}
         >
 
-          {/* BODY */}
           <div className="absolute bottom-4 w-full h-12 bg-[var(--showroomly-accent)] rounded-full shadow-lg"></div>
 
           {/* ROOF */}
