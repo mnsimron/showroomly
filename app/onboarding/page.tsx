@@ -159,31 +159,100 @@ const fetchPaymentInfo = async () => {
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
-        <h2 className="text-2xl font-bold text-slate-900 mb-1">Aktivasi Katalog</h2>
-        <p className="text-slate-500 text-sm mb-6">Showroom: <span className="font-bold text-slate-700">{paymentData?.showrooms?.name}</span></p>
+return (
+  <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100 text-center">
 
-        <div className="bg-slate-900 text-white p-6 rounded-2xl mb-8">
-          <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Total Transfer (Tepat)</p>
-          <p className="text-4xl font-black italic tracking-tighter">Rp {paymentData?.amount.toLocaleString('id-ID')}</p>
+      {/* TITLE */}
+      <h2 className="text-xl md:text-2xl font-black text-slate-900 mb-1">
+        Aktivasi Katalog
+      </h2>
+      <p className="text-slate-500 text-xs md:text-sm mb-6">
+        Showroom:{" "}
+        <span className="font-bold text-slate-700">
+          {paymentData?.showrooms?.name}
+        </span>
+      </p>
+
+      {/* PAYMENT CARD */}
+      <div className="bg-slate-900 text-white p-5 md:p-6 rounded-2xl mb-6 relative overflow-hidden">
+
+        {/* BCA LOGO */}
+        <img
+          src="bca.png"
+          alt="BCA"
+          className="h-6 absolute top-4 right-4 opacity-90"
+        />
+
+        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">
+          Transfer ke
+        </p>
+
+        {/* REKENING */}
+        <p className="text-sm md:text-base font-bold">
+          Bank Central Asia <br></br> a.n <br></br>MUHAMMAD NURSALIM IMRON
+        </p>
+
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <p className="text-lg md:text-xl font-black tracking-widest">
+            8850832537
+          </p>
+
+          {/* COPY BUTTON */}
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText("8850832537");
+              alert("Nomor rekening disalin!");
+            }}
+            className="px-2 py-1 text-[10px] bg-white/10 hover:bg-white/20 rounded-lg font-bold"
+          >
+            Salin
+          </button>
         </div>
 
-        <div className="space-y-4 text-left">
-          <label className="text-sm font-bold text-slate-700 ml-1">Upload Bukti Transfer</label>
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleUpload}
-            disabled={uploading}
-            className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-emerald-500 file:text-white cursor-pointer"
-          />
-          {paymentData?.proof_url && (
-            <p className="text-xs text-emerald-600 font-bold bg-emerald-50 p-2 rounded text-center">✓ Bukti sudah terunggah.</p>
-          )}
+        {/* AMOUNT */}
+        <div className="mt-5">
+          <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+            Total Transfer (Tepat)
+          </p>
+          <p className="text-3xl md:text-4xl font-black italic tracking-tighter mt-1">
+            Rp {paymentData?.amount.toLocaleString("id-ID")}
+          </p>
+          <p className="text-[10px] text-slate-400 mt-1">
+            Transfer sesuai nominal di atas
+          </p>
         </div>
       </div>
+
+      {/* UPLOAD */}
+      <div className="space-y-3 text-left">
+        <label className="text-xs md:text-sm font-bold text-slate-700 ml-1">
+          Upload Bukti Transfer
+        </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          disabled={uploading}
+          className="w-full text-xs text-slate-500 
+          file:mr-4 file:py-2 file:px-4 file:rounded-xl 
+          file:border-0 file:text-xs file:font-bold 
+          file:bg-emerald-500 file:text-white cursor-pointer"
+        />
+
+        {paymentData?.proof_url && (
+          <p className="text-xs text-emerald-600 font-bold bg-emerald-50 p-2 rounded text-center">
+            ✓ Bukti sudah terunggah.
+          </p>
+        )}
+      </div>
+
+      {/* NOTE */}
+      <p className="text-[10px] text-slate-400 mt-6">
+        Setelah transfer & upload bukti, tim kami akan memverifikasi dalam beberapa menit.
+      </p>
+
     </div>
-  );
-}
+  </div>
+);}

@@ -18,6 +18,7 @@ import {
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showActivationModal, setShowActivationModal] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -185,8 +186,9 @@ export default function RegisterPage() {
             </div>
 
             <button 
-              type="submit" 
-              disabled={loading} 
+              type="button"
+              onClick={() => setShowActivationModal(true)}
+              disabled={loading}
               className="w-full bg-[#1e293b] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-[#10b981] transition-all shadow-xl shadow-slate-200 mt-4 disabled:opacity-50"
             >
               {loading ? (
@@ -219,6 +221,57 @@ export default function RegisterPage() {
           Powered by Showroomly Engine
         </p>
       </div>
+      {showActivationModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowActivationModal(false)}
+        >
+          <div 
+            className="w-full max-w-sm bg-white rounded-2xl p-6 shadow-xl text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-black text-slate-900 mb-2">
+              Aktivasi Katalog
+            </h2>
+
+            <p className="text-sm text-slate-500 mb-4">
+              Selanjut nya anda akan masuk kehalaman onboarding. Untuk mengaktifkan katalog showroom, dikenakan biaya:
+            </p>
+
+            <p className="text-3xl font-black text-[#10b981] mb-4">
+              Rp 100.000
+            </p>
+
+            <p className="text-xs text-slate-400 mb-6">
+              Pembayaran dilakukan setelah pendaftaran melalui transfer bank, dan akan diverifikasi oleh tim showroomly.
+            </p>
+
+            <div className="flex gap-3">
+              
+              {/* BATAL */}
+              <button
+                onClick={() => setShowActivationModal(false)}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-xs"
+              >
+                Batal
+              </button>
+
+              {/* LANJUT */}
+              <button
+                onClick={() => {
+                  setShowActivationModal(false);
+                  const form = document.querySelector("form");
+                  form?.requestSubmit();
+                }}
+                className="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-bold text-xs"
+              >
+                Lanjut
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

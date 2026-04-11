@@ -314,6 +314,8 @@ return (
           )}
         </div>
       </div>
+      {/* ERROR MESSAGE */} {error && ( <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 font-medium"> {error} <button onClick={() => setError(null)} className="float-right ml-4 font-bold hover:text-red-900" > × </button> </div> )}
+      {logoModalOpen && ( <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setLogoModalOpen(false)}> <div className="max-w-md w-full bg-white rounded-[2rem] shadow-2xl border border-slate-200 p-6" onClick={(event) => event.stopPropagation()}> <div className="flex flex-col gap-4"> <div className="flex items-center justify-between gap-4"> <div> <h2 className="text-lg font-black text-slate-900">Logo Showroom Belum Tersedia</h2> <p className="text-sm text-slate-500 mt-1">Watermark belum dapat dibuat tanpa logo showroom.</p> </div> <button type="button" onClick={() => setLogoModalOpen(false)} className="text-slate-400 hover:text-slate-900 transition-colors" > × </button> </div> <div className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-600"> {logoError} </div> <div className="flex justify-end gap-3 pt-2"> <button type="button" onClick={() => setLogoModalOpen(false)} className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors" > Tutup </button> <button type="button" onClick={() => { setLogoModalOpen(false); router.push('/dashboard/settings'); }} className="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-700 transition-colors" > Buka Settings </button> </div> </div> </div> </div> )}
 
       {/* GRID / LIST */}
       {viewMode === "grid" ? (

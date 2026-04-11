@@ -261,6 +261,7 @@ return (
                     type="number"
                     defaultValue={showroom.whatsapp}
                     className="w-full p-3 md:p-4 text-sm bg-slate-50 rounded-xl md:rounded-2xl mt-1 font-bold text-[#10b981]"
+                    placeholder="Masukkan No Whatsapp Anda"
                   />
                 </div>
 
@@ -271,8 +272,9 @@ return (
                   <textarea
                     name="address"
                     defaultValue={showroom.address}
-                    rows={3}
-                    className="w-full p-3 md:p-4 text-sm bg-slate-50 rounded-xl md:rounded-2xl mt-1 font-bold"
+                    rows={5}
+                    className="w-full p-3 md:p-4 text-sm bg-slate-30 rounded-xl md:rounded-2xl mt-1 font-light outline-none resize-none"
+                    placeholder="Masukkan Alamat Jelas dan Lengkap sesuai google maps"
                   />
                 </div>
 

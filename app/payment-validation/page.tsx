@@ -211,8 +211,9 @@ export default function PaymentValidationPage() {
         </div>
 
         <h2 className="text-xl font-black text-[#1e293b] uppercase tracking-tighter leading-none mb-4">
-         <span className="underline">{showroom?.name}</span> Sedang Divalidasi
+         <span className="underline">{showroom?.name}</span>
         </h2>
+          <h2 className="text-xl font-black text-[#1e293b] uppercase tracking-tighter leading-none mb-4">Sedang Divalidasi</h2>
         
         <p className="text-slate-400 text-[11px] font-bold uppercase tracking-[0.2em] leading-relaxed mb-10">
           Tim Showroomly sedang mengecek bukti transfer Anda. Proses ini biasanya memakan waktu <span className="text-[#1e293b]">5-15 menit</span> pada jam kerja.
@@ -221,7 +222,7 @@ export default function PaymentValidationPage() {
         <div className="space-y-4">
           {/* Button Hubungi Admin */}
           <a 
-            href="https://wa.me Admin Showroomly, saya sudah upload bukti bayar. Mohon bantu verifikasi."
+            href="https://wa.me/6281290158831?text=Admin%20Showroomly,%20saya%20sudah%20upload%20bukti%20bayar.%20Mohon%20bantu%20verifikasi."
             target="_blank"
             className="w-full py-4 bg-[#1e293b] text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-[#10b981] transition-all shadow-xl shadow-slate-200"
           >

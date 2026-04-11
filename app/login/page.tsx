@@ -326,12 +326,18 @@ return (
           <p className="text-slate-500">
             Belum punya showroom?
           </p>
-
           <Link
             href="/register"
             className="text-[var(--showroomly-accent)] font-bold hover:underline"
           >
             Daftarkan sekarang
+          </Link>
+          <br></br>
+          <Link
+            href="/"
+            className="text-[var(--showroomly-accent)] font-light hover:underline mt-5 inline-block"
+          >
+            Kembali ke Beranda
           </Link>
         </div>
 

@@ -23,23 +23,38 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--showroomly-light)] text-[var(--showroomly-primary)] selection:bg-[var(--showroomly-accent)] selection:text-white">
       {/* --- FLOATING NAVBAR --- */}
-      <nav className="fixed top-6 inset-x-0 z-50 max-w-5xl mx-auto px-6">
-        <div className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-3xl px-8 py-4 flex justify-between items-center">
+      <nav className="fixed top-4 md:top-6 inset-x-0 z-50 max-w-5xl mx-auto px-4 md:px-6">
+        <div className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl md:rounded-3xl px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
+
+          {/* LOGO */}
           <div className="flex items-center gap-2">
-            {/* <div className="w-8 h-8 bg-[var(--showroomly-primary)] rounded-xl flex items-center justify-center font-black shadow-lg text-white text-xl">S</div> */}
-            <img src="/showroomly.svg" alt="Showroomly" className="h-9 w-auto" />
+            <img src="/showroomly.svg" alt="Showroomly" className="h-7 md:h-9 w-auto" />
           </div>
+
+          {/* MENU (DESKTOP ONLY) */}
           <div className="hidden md:flex gap-8 font-bold text-[10px] uppercase tracking-widest text-slate-400">
             <Link href="#explore" className="hover:text-[var(--showroomly-accent)] transition-colors">Stok</Link>
             <Link href="#" className="hover:text-[var(--showroomly-accent)] transition-colors">Cara Kerja</Link>
           </div>
-          <div className="flex gap-4">
-          <Link href="/register" className="bg-[var(--showroomly-primary)] text-white px-5 py-2 rounded-2xl font-black text-xs hover:bg-[var(--showroomly-accent)] transition-all active:scale-95">
-            Daftar
-          </Link>
-          <Link href="/dashboard" className="bg-[var(--showroomly-primary)] text-white px-5 py-2 rounded-2xl font-black text-xs hover:bg-[var(--showroomly-accent)] transition-all active:scale-95">
-            Masuk Admin
-          </Link>
+
+          {/* CTA BUTTONS */}
+          <div className="flex items-center gap-2 md:gap-4">
+            
+            <Link 
+              href="/register" 
+              className="bg-[var(--showroomly-primary)] text-white px-3 md:px-5 py-2 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs hover:bg-[var(--showroomly-accent)] transition-all active:scale-95 whitespace-nowrap"
+            >
+              Daftar
+            </Link>
+
+            <Link 
+              href="/dashboard" 
+              className="bg-white border border-slate-200 text-[var(--showroomly-primary)] px-3 md:px-5 py-2 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs hover:bg-[var(--showroomly-primary)] hover:text-white transition-all active:scale-95 whitespace-nowrap"
+            >
+              <span className="hidden md:inline">Masuk Admin</span>
+              <span className="md:hidden">Masuk</span>
+            </Link>
+
           </div>
         </div>
       </nav>
