@@ -66,7 +66,7 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto bg-white p-2 rounded-[2.5rem] shadow-2xl flex items-center gap-2 border border-slate-100">
           <div className="flex-1 flex items-center gap-3 px-6">
             <HiOutlineSearch className="text-slate-300" size={24} />
-            <input type="text" placeholder="Cari mobil impian Anda..." className="w-full py-4 font-bold text-[var(--showroomly-primary)] placeholder:text-slate-300 border-none outline-none" />
+            <input type="text" placeholder="Cari mobil impian Anda..." suppressHydrationWarning className="w-full py-4 font-bold text-[var(--showroomly-primary)] placeholder:text-slate-300 border-none outline-none" />
           </div>
           <button className="bg-[var(--showroomly-primary)] text-white px-10 py-4 rounded-[2rem] font-black hover:bg-[var(--showroomly-accent)] transition-all">
             Cari Unit

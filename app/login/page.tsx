@@ -208,53 +208,53 @@ useEffect(() => {
 return (
   <div className="min-h-screen grid md:grid-cols-2 bg-[var(--showroomly-light)]">
 
-  {/* LEFT SIDE */}
-  <div className="hidden md:flex flex-col justify-center px-16 bg-[var(--showroomly-light-bg)] text-white overflow-hidden">
-    <div className="flex items-center gap-2 mb-10">
-      <img src="/showroomly.svg" alt="Showroomly" className="h-12 md:h-14 w-auto" />
-    </div>
+    {/* LEFT SIDE (DESKTOP ONLY) */}
+    <div className="hidden md:flex flex-col justify-center px-16 bg-[var(--showroomly-light-bg)] text-white overflow-hidden">
+      <div className="flex items-center gap-2 mb-10">
+        <img src="/showroomly.svg" alt="Showroomly" className="h-12 md:h-14 w-auto" />
+      </div>
 
-    <h1 className="text-5xl font-black leading-tight mb-6">
-      Kelola Katalog <br /> Showroom Anda
-    </h1>
+      <h1 className="text-5xl font-black leading-tight mb-6">
+        Kelola Katalog <br /> Showroom Anda
+      </h1>
 
-    <p className="text-white-300 text-lg leading-relaxed max-w-md">
-      Showroomly membantu showroom mobil memiliki katalog digital yang
-      modern, mudah dikelola, dan siap dibagikan ke pelanggan kapan saja.
-    </p>
+      <p className="text-white-300 text-lg leading-relaxed max-w-md">
+        Showroomly membantu showroom mobil memiliki katalog digital yang
+        modern, mudah dikelola, dan siap dibagikan ke pelanggan kapan saja.
+      </p>
 
-    {/* LOGO CAROUSEL */}
-    <div className="mt-12 w-full overflow-hidden">
-      <div className="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-[var(--showroomly-light-bg)] to-transparent z-10" />
-      {/* <div className="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-[var(--showroomly-light-bg)] to-transparent z-10" /> */}
-      <div className="flex gap-10 animate-logo-scroll w-max">
+      <div className="mt-12 w-full overflow-hidden">
+        <div className="flex gap-10 animate-logo-scroll w-max">
+          {[...logos, ...logos].map((logo, i) => (
+            <img key={i} src={logo} className="h-20 w-auto opacity-70" />
+          ))}
+        </div>
+      </div>
 
-        {[...logos, ...logos].map((logo, i) => (
-          <img
-            key={i}
-            src={logo}
-            className="h-20 w-auto opacity-70 hover:opacity-100 transition"
-          />
-        ))}
-
+      <div className="mt-12 text-sm text-white-400">
+        Powered by Showroomly.
       </div>
     </div>
 
-    <div className="mt-12 text-sm text-white-400">
-      Powered by Showroomly.
-    </div>
-
-  </div>
-
     {/* RIGHT SIDE */}
-    <div className="flex items-center justify-center p-8">
+    <div className="flex flex-col justify-top p-6 md:p-8 md:justify-center">
 
-      <div className="max-w-md w-full">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-black text-[var(--showroomly-primary)]">
+      {/* MOBILE HEADER (NEW) */}
+      <div className="md:hidden mb-8 text-center">
+        <img src="/showroomly.svg" className="h-10 mx-auto mb-4" />
+        <p className="text-xs text-slate-400 mt-1">
+          Kelola katalog mobil lebih mudah
+        </p>
+      </div>
+
+      <div className="max-w-md w-full mx-auto">
+
+        {/* TITLE */}
+        <div className="mb-6 md:mb-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-black text-[var(--showroomly-primary)]">
             Masuk Showroomly
           </h2>
-          <p className="text-slate-500 mt-2 text-sm">
+          <p className="text-slate-500 mt-2 text-xs md:text-sm">
             Akses dashboard showroom Anda
           </p>
         </div>
@@ -265,10 +265,11 @@ return (
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-4 md:space-y-5">
 
+          {/* EMAIL */}
           <div>
-            <label className="text-sm font-semibold text-slate-600">
+            <label className="text-xs md:text-sm font-semibold text-slate-600">
               Email
             </label>
 
@@ -276,67 +277,66 @@ return (
               name="email"
               type="email"
               placeholder="Masukkan email Anda"
-              className="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[var(--showroomly-accent)] outline-none"
+              className="mt-1 w-full p-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-[var(--showroomly-accent)] outline-none"
               required
             />
           </div>
 
-            <div>
-            <label className="text-sm font-semibold text-slate-600">
+          {/* PASSWORD */}
+          <div>
+            <label className="text-xs md:text-sm font-semibold text-slate-600">
               Password
             </label>
 
             <div className="relative">
               <input
-              name="password"
-              type="password"
-              placeholder="Masukkan password Anda"
-              className="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[var(--showroomly-accent)] outline-none"
-              required
+                name="password"
+                type="password"
+                placeholder="Masukkan password Anda"
+                className="mt-1 w-full p-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-[var(--showroomly-accent)] outline-none"
+                required
               />
-                <button
+
+              <button
                 type="button"
                 onClick={(e) => {
-                const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
-                input.type = input.type === "password" ? "text" : "password";
+                  const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                  input.type = input.type === "password" ? "text" : "password";
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                </button>
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+              >
+                👁
+              </button>
             </div>
-            </div>
+          </div>
 
+          {/* BUTTON */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--showroomly-accent)] text-white py-3 rounded-xl font-bold hover:scale-[1.02] transition-all shadow-md"
+            className="w-full bg-[var(--showroomly-accent)] text-white py-3 text-sm rounded-xl font-bold hover:scale-[1.02] transition-all shadow-md"
           >
             {loading ? "Menghubungkan..." : "Masuk ke Dashboard"}
           </button>
 
         </form>
 
-        <div className="mt-8 pt-6 border-t border-slate-100 text-center text-sm">
+        {/* REGISTER */}
+        <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-slate-100 text-center text-xs md:text-sm">
           <p className="text-slate-500">
-            Belum punya showroom di Showroomly?
+            Belum punya showroom?
           </p>
 
           <Link
             href="/register"
             className="text-[var(--showroomly-accent)] font-bold hover:underline"
           >
-            Daftarkan Showroom
+            Daftarkan sekarang
           </Link>
         </div>
 
       </div>
-
     </div>
-
   </div>
 );
 }
