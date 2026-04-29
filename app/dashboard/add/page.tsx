@@ -26,7 +26,10 @@ export default function AddCarPage() {
   const [mileage, setMileage] = useState("");
   const [tags, setTags] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  
+  const [description, setDescription] = useState("");
+  const [transmission, setTransmission] = useState("");
+  const [type_car, setType_car] = useState("");
+
   // State Utama untuk Foto
   const [photoQueue, setPhotoQueue] = useState<PhotoItem[]>([]);
   const router = useRouter();
@@ -129,12 +132,12 @@ export default function AddCarPage() {
         brand: formData.get("brand"),
         model: formData.get("model"),
         year: parseInt(formData.get("year") as string),
-        transmission: formData.get("transmission"),
-        type_car: formData.get("type_car"),
+        transmission: transmission,
+        type_car: type_car,
         mileage: Number(mileage.replace(/[^0-9]/g, "")),      
         price_cash: Number(priceCash.replace(/[^0-9]/g, "")),    
         price_credit: Number(priceCredit.replace(/[^0-9]/g, "")), 
-        description: formData.get("description"),
+        description: description,
         tags: tagsArray,
         status: 'available',
       };
@@ -277,7 +280,10 @@ return (
           <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
             Kategori
           </label>
-          <select className="w-full p-3 md:p-4 text-sm bg-slate-50 rounded-xl md:rounded-2xl mt-1 font-bold">
+          <select 
+          value={type_car}
+          onChange={(e) => setType_car(e.target.value)}
+          className="w-full p-3 md:p-4 text-sm bg-slate-50 rounded-xl md:rounded-2xl mt-1 font-bold">
             <option>MPV</option>
             <option>SUV</option>
             <option>Hatchback</option>
@@ -291,7 +297,10 @@ return (
           <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
             Transmisi
           </label>
-          <select className="w-full p-3 md:p-4 text-sm bg-slate-50 rounded-xl md:rounded-2xl mt-1 font-bold">
+          <select 
+          value={transmission}
+          onChange={(e) => setTransmission(e.target.value)}
+          className="w-full p-3 md:p-4 text-sm bg-slate-50 rounded-xl md:rounded-2xl mt-1 font-bold">
             <option>AT</option>
             <option>MT</option>
           </select>
@@ -351,6 +360,8 @@ return (
           </div>
         <div className="md:col-span-2">
           <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             rows={4}
             placeholder="Deskripsi..."
             className="w-full p-3 md:p-4 text-sm bg-slate-50 rounded-xl md:rounded-2xl"

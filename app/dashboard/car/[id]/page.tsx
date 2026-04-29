@@ -14,6 +14,9 @@ export default function CarDetailPage() {
   const [car, setCar] = useState<any>(null);
   const [activeImg, setActiveImg] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isEdit, setIsEdit] = useState(false);
+  const [form, setForm] = useState<any>({});
+  const [showToast, setShowToast] = useState(false);
 
   // Fungsi helper untuk format Rupiah di tampilan
   const formatIDR = (amount: number) => {
@@ -34,6 +37,7 @@ export default function CarDetailPage() {
 
       if (data) {
         setCar(data);
+        setForm(data);
       } else {
         router.push("/dashboard");
       }
@@ -46,6 +50,38 @@ export default function CarDetailPage() {
   if (!car) return null;
 
   const images = car.car_images || [];
+
+  const handleUpdate = async () => {
+  setLoading(true);
+
+  const { error } = await supabase
+      .from("cars")
+      .update({
+        brand: form.brand,
+        type_car: form.type_car || "",
+        year: form.year,
+        transmission: form.transmission,
+        mileage: form.mileage,
+        price_cash: form.price_cash,
+        price_credit: form.price_credit,
+        description: form.description,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+      if (!error) {
+        setCar(form);
+        setIsEdit(false);
+
+        setShowToast(true);
+
+        setTimeout(() => {
+          setShowToast(false);
+        }, 2500);
+      }
+
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
@@ -93,80 +129,238 @@ export default function CarDetailPage() {
               ))}
             </div>
           </div>
-
           {/* KANAN: INFO DETAIL */}
           <div className="flex flex-col gap-6">
-            <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100">
-              <div className="flex justify-between items-center mb-6">
-                <span className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-200">
+            <div className="bg-white rounded-3xl lg:rounded-[2rem] p-6 lg:p-8 shadow-sm border border-slate-100">
+
+              {/* HEADER */}
+              <div className="flex justify-between items-start mb-6 gap-3">
+
+                <span className="bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                   {car.status}
                 </span>
-                <div className="text-right">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Mulai Dari</p>
-                  <h2 className="text-3xl font-black text-slate-900 leading-none">{formatIDR(car.price_cash)}</h2>
+
+                <div className="flex gap-2">
+                  {!isEdit ? (
+                    <button onClick={() => setIsEdit(true)} className="px-4 py-2 bg-slate-100 rounded-xl text-sm font-bold">
+                      Edit
+                    </button>
+                  ) : (
+                    <>
+                      <button onClick={() => setIsEdit(false)} className="px-4 py-2 bg-slate-100 rounded-xl text-sm font-bold">
+                        Batal
+                      </button>
+                      <button onClick={handleUpdate} className="px-4 py-2 bg-[var(--showroomly-accent)] text-white rounded-xl text-sm font-bold">
+                        Simpan
+                      </button>
+                    </>
+                  )}
                 </div>
-              </div>
-              
-              <h1 className="text-4xl font-black text-slate-800 leading-tight mb-6">
-                {car.brand} <span className="text-primary">{car.model}</span>
-              </h1>
-              
-              {/* Grid Spek Singkat */}
-              <div className="grid grid-cols-4 gap-3 mb-8">
-                <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-100">
-                  <FaCarSide className="text-primary mb-1" size={20} />
-                  <span className="text-xs font-black text-slate-800">{car.year}</span>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-100">
-                  <HiCalendar className="text-primary mb-1" size={20} />
-                  <span className="text-xs font-black text-slate-800">{car.type_car}</span>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-100">
-                  <HiLightningBolt className="text-primary mb-1" size={20} />
-                  <span className="text-xs font-black text-slate-800 uppercase">{car.transmission}</span>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-100">
-                  <HiTag className="text-primary mb-1" size={20} />
-                  <span className="text-[10px] font-black text-slate-800">{(car.mileage || 0).toLocaleString()} KM</span>
-                </div>
+
               </div>
 
-              {/* Detail Harga & Pembayaran */}
-              <div className="space-y-3 mb-8">
-                <div className="flex justify-between items-center p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                  <span className="text-sm font-bold text-emerald-700">Harga Cash</span>
-                  <span className="text-lg font-black text-emerald-700">{formatIDR(car.price_cash)}</span>
-                </div>
-                {car.price_credit > 0 && (
-                  <div className="flex justify-between items-center p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                    <span className="text-sm font-bold text-blue-700">Harga Kredit</span>
-                    <span className="text-lg font-black text-blue-700">{formatIDR(car.price_credit)}</span>
-                  </div>
+              {/* PRICE */}
+              <div className="mb-6">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Mulai Dari</p>
+
+                {isEdit ? (
+                  <input
+                    value={form.price_cash}
+                    onChange={(e) => setForm({ ...form, price_cash: e.target.value })}
+                    className="text-2xl font-black bg-transparent border-b border-slate-200 focus:outline-none w-full"
+                  />
+                ) : (
+                  <h2 className="text-2xl font-black">
+                    {formatIDR(car.price_cash)}
+                  </h2>
                 )}
               </div>
 
-              {/* Deskripsi */}
-              <div className="border-t border-slate-100 pt-6">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Informasi Kendaraan</p>
-                <div className="text-slate-600 text-sm leading-relaxed whitespace-pre-line bg-slate-50 p-5 rounded-2xl italic">
-                  {car.description || "Penjual belum memberikan deskripsi lengkap."}
-                </div>
+              {/* TITLE */}
+              <div className="mb-6">
+                {isEdit ? (
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      value={form.brand}
+                      onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                      className="text-3xl font-black bg-transparent border-b border-slate-200 focus:outline-none w-full"
+                    />
+                    <input
+                      value={form.model}
+                      onChange={(e) => setForm({ ...form, model: e.target.value })}
+                      className="text-3xl font-black text-primary bg-transparent border-b border-slate-200 focus:outline-none w-full"
+                    />
+                  </div>
+                ) : (
+                  <h1 className="text-3xl lg:text-4xl font-black">
+                    {car.brand} <span className="text-primary">{car.model}</span>
+                  </h1>
+                )}
               </div>
 
-              {/* Tags */}
-              <div className="flex gap-2 mt-6 flex-wrap">
-                {car.tags?.map((t: string) => (
-                  <span key={t} className="bg-slate-100 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase">{t}</span>
-                ))}
+              {/* SPECS */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+
+                {/* YEAR */}
+                <div className="bg-slate-50 p-3 rounded-2xl text-center">
+                  <HiCalendar className="mx-auto mb-1 text-primary" />
+                  {isEdit ? (
+                    <input
+                      value={form.year}
+                      onChange={(e) => setForm({ ...form, year: e.target.value })}
+                      className="text-xs font-black text-center bg-white w-full border outline-none"
+                    />
+                  ) : (
+                    <span className="text-xs font-black">{car.year}</span>
+                  )}
+                </div>
+
+                {/* TYPE */}
+                <div className="bg-slate-50 p-3 rounded-2xl text-center">
+                  <FaCarSide className="mx-auto mb-1 text-primary" />
+                  {isEdit ? (
+                    <select
+                      value={form.type_car || ""}
+                      onChange={(e) => setForm({ ...form, type_car: e.target.value })}
+                      className="text-xs font-black bg-white w-full border outline-none"
+                      name="type_car"
+                    >
+                    <option>MPV</option>
+                    <option>SUV</option>
+                    <option>Hatchback</option>
+                    <option>City Car</option>
+                    <option>Sedan</option>
+                    </select>
+                  ) : (
+                    <span className="text-xs font-black">{car.type_car}</span>
+                  )}
+                </div>
+
+                {/* TRANSMISSION */}
+                <div className="bg-slate-50 p-3 rounded-2xl text-center">
+                  <HiLightningBolt className="mx-auto mb-1 text-primary" />
+                  {isEdit ? (
+                    <select
+                      value={form.transmission}
+                      onChange={(e) => setForm({ ...form, transmission: e.target.value })}
+                      className="text-xs font-black bg-white w-full border outline-none"
+                      name="transmission"
+                    >
+                      <option value="AT">AT</option>
+                      <option value="MT">MT</option>
+                    </select>
+                  ) : (
+                    <span className="text-xs font-black uppercase">{car.transmission}</span>
+                  )}
+                </div>
+
+                {/* KM */}
+                <div className="bg-slate-50 p-3 rounded-2xl text-center">
+                  <HiTag className="mx-auto mb-1 text-primary" />
+                  {isEdit ? (
+                    <input
+                      value={form.mileage}
+                      onChange={(e) => setForm({ ...form, mileage: e.target.value })}
+                      className="text-xs font-black text-center bg-white w-full border outline-none"
+                    />
+                  ) : (
+                    <span className="text-xs font-black">
+                      {(car.mileage || 0).toLocaleString()} KM
+                    </span>
+                  )}
+                </div>
+
               </div>
+
+              {/* PRICE DETAIL */}
+              <div className="space-y-3 mb-8">
+
+                <div className="flex justify-between p-4 bg-emerald-50 rounded-2xl">
+                  <span className="text-sm font-bold text-emerald-700">Harga Cash</span>
+
+                  {isEdit ? (
+                    <input
+                      value={form.price_cash}
+                      onChange={(e) => setForm({ ...form, price_cash: e.target.value })}
+                      className="text-right font-bold bg-white border outline-none"
+                    />
+                  ) : (
+                    <span className="font-black text-emerald-700">
+                      {formatIDR(car.price_cash)}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex justify-between p-4 bg-blue-50 rounded-2xl">
+                  <span className="text-sm font-bold text-blue-700">Harga Kredit</span>
+
+                  {isEdit ? (
+                    <input
+                      value={form.price_credit}
+                      onChange={(e) => setForm({ ...form, price_credit: e.target.value })}
+                      className="text-right font-bold bg-white border outline-none"
+                    />
+                  ) : (
+                    <span className="font-black text-blue-700">
+                      {formatIDR(car.price_credit)}
+                    </span>
+                  )}
+                </div>
+
+              </div>
+
+              {/* DESCRIPTION */}
+              <div className="border-t pt-6">
+                <p className="text-xs font-bold text-slate-400 mb-3">Informasi Kendaraan</p>
+
+                {isEdit ? (
+                  <textarea
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="w-full p-4 rounded-2xl border"
+                    rows={4}
+                  />
+                ) : (
+                  <div className="text-sm whitespace-pre-line bg-slate-50 p-4 rounded-2xl italic">
+                    {car.description || "-"}
+                  </div>
+                )}
+              </div>
+              <div className="text-sm text-slate-400 mt-4">
+                Terakhir diperbarui: {new Date(car.updated_at).toLocaleString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric"
+                })}
+              </div>
+
             </div>
-                        <button className="w-full bg-green-500 text-white py-5 rounded-[1.5rem] font-black text-xl hover:bg-green-600 transition-all shadow-2xl shadow-green-500/30 flex items-center justify-center gap-3">
-                          <HiOutlineShare size={24} />
-                          Bagikan Katalog ke WhatsApp
-                        </button>
+          </div>
+            {/* Tombol CTA - Tetap di bawah atau Floating di mobile */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg lg:relative lg:bg-transparent lg:p-0 border-t lg:border-0 z-50">
+              <button className="w-full bg-green-500 text-white py-4 lg:py-5 rounded-2xl lg:rounded-[1.5rem] font-black text-lg lg:text-xl hover:bg-green-600 transition-all shadow-xl shadow-green-200 flex items-center justify-center gap-3">
+                <HiOutlineShare size={24} />
+                Hubungi Penjual
+              </button>
+            </div>
           </div>
         </div>
+        {showToast && (
+          <div className="fixed top-6 right-6 z-[999] animate-slideIn">
+            <div className="bg-[var(--showroomly-primary)] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10">
+              
+              <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--showroomly-accent)] text-white font-black">
+                ✓
+              </div>
+
+              <div>
+                <p className="font-bold text-sm">Berhasil!</p>
+                <p className="text-xs text-slate-300">Unit mobil diperbaharui</p>
+              </div>
+
+            </div>
+          </div>
+        )}
       </div>
-    </div>
   );
 }
